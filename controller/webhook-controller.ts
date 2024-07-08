@@ -46,6 +46,13 @@ class WebhookController {
                     spaceId: body.data.object.spaceId
                 });
                 break;
+            case 'space_membership.deleted':
+                await BettermodeService.getInstance().leaveSubSpaces({
+                    networkId: body.data.object.networkId,
+                    memberId: body.data.object.memberId,
+                    spaceId: body.data.object.spaceId
+                });
+                break;
             default:
                 return {};
         }

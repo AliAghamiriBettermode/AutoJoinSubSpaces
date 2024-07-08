@@ -7,8 +7,9 @@ This project provides a service to handle automatically joining sub spaces after
 1. **Create an App and Install It**
     - Obtain `client_id`, `client_secret`, and `webhook_signing_secret`.
 
-2. **Add "space_membership.created" Webhook**
+2. **Setup Webhooks**
     - Add a domain name for handling webhooks.
+    - Add "space_membership.created" and "space_membership.deleted" events.
     - Update webhooks.
 
 3. **Get an Admin Member ID**

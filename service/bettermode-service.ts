@@ -68,7 +68,6 @@ class BettermodeService {
         if (!accessToken) {
             return false;
         }
-        // const subSpaces = BettermodeService.spaceMap[spaceId] ?? [];
         const space = BettermodeService.spaces.find(space => space.spaceId === spaceId);
         if (!space) {
             return false;
@@ -109,6 +108,45 @@ class BettermodeService {
             return false;
         }
     }
+
+    async leaveSubSpaces(data: { networkId: string, memberId: string, spaceId: string }) {
+        const {networkId, memberId, spaceId} = data;
+        const accessToken = await this.getMemberAccessToken(networkId);
+        if (!accessToken) {
+            return false;
+        }
+        const space = BettermodeService.spaces.find(space => space.spaceId === spaceId);
+        if (!space) {
+            return false;
+        }
+        const subSpaces = await this.getCollectionSpaces(space.collectionId, accessToken);
+        if (!subSpaces) {
+            return false;
+        }
+        try {
+            await BlueBird.mapSeries(subSpaces, async (subSpace) => {
+                await got.post("https://api.bettermode.com", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${accessToken}`
+                    },
+                    json: {
+                        query: `mutation RemoveSpaceMembers {
+                                    removeSpaceMembers(memberIds: ["${memberId}"], spaceId: "${subSpace.id}") {
+                                        status
+                                    }
+                                }`,
+                        variables: {}
+                    }
+                });
+            });
+            return true;
+        } catch (e) {
+            console.error(e);
+            return false;
+        }
+    }
+
 
     static getInstance() {
         if (!BettermodeService.instance) {
